@@ -43,7 +43,6 @@ def train():
     all_metrics = MetricsScorer.init_all_metrics()
 
     fold_best_models = []
-
     for fold, (train_idx, val_idx) in enumerate(skf.split(df_prot, df_lb)):
         print(f"\n--- Fold {fold + 1} ---")
         train_loader = DataLoader(Subset(dataset, train_idx), batch_size=16, shuffle=True)
