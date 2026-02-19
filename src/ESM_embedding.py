@@ -30,7 +30,7 @@ def generate_embeddings(input_file_name: str, output_file_name: str):
     model = ESMC.from_pretrained("esmc_600m")
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(base_dir, "FA-Amy", "../Dataset", "Benchmark_dataset", input_file_name)
+    data_path = os.path.join(base_dir, "../Dataset", "Benchmark_dataset", input_file_name)
     records = list(SeqIO.parse(data_path, "fasta"))
     sequences = [str(record.seq) for record in records]
 
@@ -49,7 +49,7 @@ def generate_embeddings(input_file_name: str, output_file_name: str):
 
     embedding_array = np.stack(embedding_list)  # shape: (N, max_length, emb_dim)
 
-    output_dir = os.path.join(base_dir, "FA-Amy", "../Dataset", "Benchmark_dataset", "new")
+    output_dir = os.path.join(base_dir, "../Dataset", "Benchmark_dataset", "new")
     np.save(f"{output_dir}/{output_file_name}", embedding_array)
 
 
