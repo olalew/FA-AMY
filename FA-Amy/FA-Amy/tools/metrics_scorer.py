@@ -86,3 +86,17 @@ class MetricsScorer:
             FP=FP,
             FN=FN
         )
+
+    @staticmethod
+    def init_all_metrics():
+        return {
+            "SN": [],
+            "SP": [],
+            "ACC": [],
+            "BA": [],
+            "MCC": [],
+            "Pre": [],
+            "Gmean": [],
+            "F1": [],
+            "AUROC": []
+        }
