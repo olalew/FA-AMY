@@ -20,9 +20,9 @@ def run_model():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    neg_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_neg_test.npy")
-    pos_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_pos_test.npy")
-    model_path = os.path.join(base_dir, "..", "Model-saved", "Model-Saved-Benchmark")
+    neg_data_path = os.path.join(base_dir, "../Dataset", "Benchmark_dataset", "new", "esmc_neg_test.npy")
+    pos_data_path = os.path.join(base_dir, "../Dataset", "Benchmark_dataset", "new", "esmc_pos_test.npy")
+    model_path = os.path.join(base_dir, "../Model-saved", "Model-Saved-Benchmark")
 
     neg_test = np.load(neg_data_path)
     pos_test = np.load(pos_data_path)

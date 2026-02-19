@@ -22,9 +22,9 @@ def train():
     device = torch.device("cuda")
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    neg_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_neg_train.npy")
-    pos_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_pos_train.npy")
-    model_path = os.path.join(base_dir, "..", "Model-saved")
+    neg_data_path = os.path.join(base_dir, "../Dataset", "Benchmark_dataset", "new", "esmc_neg_train.npy")
+    pos_data_path = os.path.join(base_dir, "../Dataset", "Benchmark_dataset", "new", "esmc_pos_train.npy")
+    model_path = os.path.join(base_dir, "../Model-saved")
 
     neg_train = np.load(neg_data_path)
     pos_train = np.load(pos_data_path)

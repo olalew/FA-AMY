@@ -39,13 +39,13 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.abspath(__file__))
     embeddings_generator: EmbeddingsGenerator = EmbeddingsGenerator()
 
-    generate_benchmark = False
+    generate_benchmark = True
     generate_general = True
 
     # region generate benchmark embeddings
     if generate_benchmark:
-        benchmark_dir_path = os.path.join(base_dir, "..", "..", "Dataset", "Benchmark_dataset")
-        output_dir = os.path.join(base_dir, "..", "..", "Dataset", "Benchmark_dataset", "new")
+        benchmark_dir_path = os.path.join(base_dir, "../..", "Dataset", "Benchmark_dataset")
+        output_dir = os.path.join(base_dir, "../..", "Dataset", "Benchmark_dataset", "new")
 
         benchmark_embeddings_map = {
             "Pos-Test.txt": "esmc_pos_test.npy",
@@ -65,8 +65,8 @@ if __name__ == "__main__":
 
     # region generate external general dataset embedding
     if generate_general:
-        general_dir_path = os.path.join(base_dir, "..", "..", "Dataset", "Generalized_dataset")
-        output_dir = os.path.join(base_dir, "..", "..", "Dataset", "Generalized_dataset", "new")
+        general_dir_path = os.path.join(base_dir, "../..", "Dataset", "Generalized_dataset")
+        output_dir = os.path.join(base_dir, "../..", "Dataset", "Generalized_dataset", "new")
         generalized_embeddings_map = {
             "Neg_test_dataset.fasta": "esmc_neg_test.npy",
             "Neg_train_dataset.fasta": "esmc_neg_train.npy",
