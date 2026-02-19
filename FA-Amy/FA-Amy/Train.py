@@ -1,6 +1,7 @@
-from torch.utils.data import Dataset, DataLoader,Subset
+from torch.utils.data import Dataset, DataLoader, Subset
 import os
 import torch
+
 torch.use_deterministic_algorithms(True, warn_only=False)
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,7 +12,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 import copy
 
 
-def random_seed(seed):#Fixed random seed
+def random_seed(seed):  # Fixed random seed
     random.seed(seed)
     np.random.seed(seed)
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
@@ -21,31 +22,38 @@ def random_seed(seed):#Fixed random seed
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     torch.use_deterministic_algorithms(True, warn_only=True)
+
+
 random_seed(777)
 
 
-class BioinformaticsDataset(Dataset):#
-    def __init__(self, label,prot):
+class BioinformaticsDataset(Dataset):  #
+    def __init__(self, label, prot):
         self.lb = label
         self.df_prot = prot
+
     def __getitem__(self, index):
         prot = self.df_prot[index]
         prot = torch.tensor(prot, dtype=torch.float)
         label = self.lb[index]
         label = torch.tensor(label, dtype=torch.float)
-        data_length=902 # The features extracted by ESM C have padding before and after
-        return prot, label,data_length
+        data_length = 902  # The features extracted by ESM C have padding before and after
+        return prot, label, data_length
+
     def __len__(self):
         return len(self.df_prot)
+
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, dilation):
         super().__init__()
-        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size,padding=(kernel_size - 1) * dilation // 2, dilation=dilation)
+        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size, padding=(kernel_size - 1) * dilation // 2,
+                               dilation=dilation)
         self.relu = nn.ReLU()
         self.norm = nn.GroupNorm(num_groups=1, num_channels=out_channels)
         self.downsample = nn.Conv1d(in_channels, out_channels, kernel_size=1) \
             if in_channels != out_channels else nn.Identity()
+
     def forward(self, x):
         res = self.downsample(x)
         x = self.conv1(x)
@@ -53,16 +61,20 @@ class ResidualBlock(nn.Module):
         x = self.norm(x)
         return x + res
 
+
 class TCNBlock(nn.Module):
     def __init__(self, input_dim, num_channels, kernel_size=5):
         super().__init__()
         layers = []
         for i, out_channels in enumerate(num_channels):
             dilation = 2 ** i
-            layers.append(ResidualBlock(input_dim if i == 0 else num_channels[i-1],out_channels,kernel_size,dilation))
+            layers.append(
+                ResidualBlock(input_dim if i == 0 else num_channels[i - 1], out_channels, kernel_size, dilation))
         self.network = nn.Sequential(*layers)
+
     def forward(self, x):
         return self.network(x)
+
 
 class BiTCN(nn.Module):
     def __init__(self, input_dim, num_channels, kernel_size=5, merge_mode='concat'):
@@ -70,6 +82,7 @@ class BiTCN(nn.Module):
         self.forward_tcn = TCNBlock(input_dim, num_channels, kernel_size)
         self.backward_tcn = TCNBlock(input_dim, num_channels, kernel_size)
         self.merge_mode = merge_mode
+
     def forward(self, x):
         # x: (batch_size, channels, seq_len)
         x_rev = torch.flip(x, dims=[-1])
@@ -83,6 +96,7 @@ class BiTCN(nn.Module):
         else:
             raise ValueError("merge_mode must be 'concat' or 'sum'")
         return out
+
 
 class MultiHeadSelfAttention(nn.Module):
     def __init__(self, input_dim, num_heads=4):
@@ -111,7 +125,7 @@ class MultiHeadSelfAttention(nn.Module):
 
         # concat
         out = attn_output.transpose(1, 2).contiguous().view(B, L, D)  # [B, L, D]
-        out = self.out_proj(out)  #  [B, L, D]
+        out = self.out_proj(out)  # [B, L, D]
         return out
 
 
@@ -133,10 +147,10 @@ class LIA1D(nn.Module):
         x = x.transpose(1, 2)  # [B, D, L]
         g = self.gate(x[:, :1])  # Gate Control
 
-        w = self.conv1(x)       # [B, f, L]
-        w = self.softpool(w)    # ↓
-        w = self.conv2(w)       # ↓
-        w = self.conv3(w)       # [B, D, l']
+        w = self.conv1(x)  # [B, f, L]
+        w = self.softpool(w)  # ↓
+        w = self.conv2(w)  # ↓
+        w = self.conv3(w)  # [B, D, l']
         w = self.sigmoid(w)
 
         # Nearest Neighbor Interpolation (Reproducible)+Smooth Convolution
@@ -145,6 +159,7 @@ class LIA1D(nn.Module):
 
         out = x * w * g
         return out.transpose(1, 2)  # → [B, L, D]
+
 
 class FAAmyModule(nn.Module):
     def __init__(self):
@@ -158,12 +173,13 @@ class FAAmyModule(nn.Module):
         self.att1 = MultiHeadSelfAttention(input_dim=128, num_heads=4)
         self.att2 = LIA1D(128, f=64)
         self.relu = nn.LeakyReLU()
+
     def forward(self, prot0):
         prot2 = self.bitcn(prot0.permute(0, 2, 1))  # [B, 128, L]
         prot2 = prot2.permute(0, 2, 1)
         atten1 = self.att1(prot2)
         atten2 = self.att2(prot2)
-        fused =  0.5 * atten1 + 0.5 * atten2
+        fused = 0.5 * atten1 + 0.5 * atten2
         pooled = prot2 + fused
         pooled = torch.mean(pooled, dim=1)
         x = self.fc2(pooled)
@@ -175,12 +191,12 @@ class FAAmyModule(nn.Module):
         x = self.fc4(x)
         return x
 
-def train():
 
+def train():
     device = torch.device("cuda")
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    neg_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "esmc_neg_train.npy")
-    pos_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "esmc_pos_train.npy")
+    neg_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_neg_train.npy")
+    pos_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_pos_train.npy")
     model_path = os.path.join(base_dir, "..", "Model-saved")
     neg_train = np.load(neg_data_path)
     pos_train = np.load(pos_data_path)
@@ -190,8 +206,8 @@ def train():
     dataset = BioinformaticsDataset(df_lb, df_prot)
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=777)
 
-    epochs = 100   #Maximum of training epochs
-    patience = 10  #Early Stopping patience
+    epochs = 100  # Maximum of training epochs
+    patience = 10  # Early Stopping patience
 
     all_metrics = {
         "SN": [], "SP": [], "ACC": [], "BA": [],
@@ -242,9 +258,8 @@ def train():
             SP = TN / (TN + FP) if (TN + FP) != 0 else 0
             BA = (SN + SP) / 2
 
-
             min_epoch_to_save = 15  # warm up
-            if BA > best_val_ba:    # To select the model with the strongest discriminative ability, we used the balanced accuracy as the evaluation criterion.
+            if BA > best_val_ba:  # To select the model with the strongest discriminative ability, we used the balanced accuracy as the evaluation criterion.
                 if epoch >= min_epoch_to_save:
                     best_val_ba = BA
                     best_model_state = copy.deepcopy(model.state_dict())
@@ -258,7 +273,6 @@ def train():
                 if epochs_no_improve >= patience:
                     print(f"Early stopping triggered after {epoch + 1} epochs.")
                     break
-
 
         best_model_path = os.path.join(model_path, f"best_fold{fold}.pth")
         torch.save(best_model_state, best_model_path)
@@ -290,12 +304,12 @@ def train():
         Gmean = np.sqrt(SN * SP)
         F1 = 2 * Pre * SN / (Pre + SN)
 
-        print(f"Fold {fold+1} Best Model --- SN:{SN:.3f} SP:{SP:.3f} ACC:{ACC:.3f} BA:{BA:.3f} MCC:{MCC:.3f} Pre:{Pre:.3f} AUROC:{AUROC:.3f} G-mean:{Gmean:.3f} F1:{F1:.3f}")
+        print(
+            f"Fold {fold + 1} Best Model --- SN:{SN:.3f} SP:{SP:.3f} ACC:{ACC:.3f} BA:{BA:.3f} MCC:{MCC:.3f} Pre:{Pre:.3f} AUROC:{AUROC:.3f} G-mean:{Gmean:.3f} F1:{F1:.3f}")
 
-        for metric, value in zip(["SN","SP","ACC","BA","MCC","Pre","Gmean","F1","AUROC"],
-                                 [SN,SP,ACC,BA,MCC,Pre,Gmean,F1,AUROC]):
+        for metric, value in zip(["SN", "SP", "ACC", "BA", "MCC", "Pre", "Gmean", "F1", "AUROC"],
+                                 [SN, SP, ACC, BA, MCC, Pre, Gmean, F1, AUROC]):
             all_metrics[metric].append(value)
-
 
     print("\n===== 5-Fold Cross Validation Summary =====")
     for metric in all_metrics:
@@ -322,4 +336,3 @@ if __name__ == "__main__":
     print("use cuda: {}".format(cuda))
     device = torch.device("cuda" if cuda else "cpu")
     train()
-
