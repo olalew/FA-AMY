@@ -12,9 +12,9 @@ if __name__ == '__main__':
     # region train benchmark
     if test_benchmark:
         RandomSeed.random_seed(777)
-        neg_data_path = os.path.join(base_dir, "../..", "Dataset", "Benchmark_dataset", "new", "esmc_neg_test.npy")
-        pos_data_path = os.path.join(base_dir, "../..", "Dataset", "Benchmark_dataset", "new", "esmc_pos_test.npy")
-        model_path = os.path.join(base_dir, "../..", "Model-saved", "Model-Saved-Benchmark")
+        neg_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_neg_test.npy")
+        pos_data_path = os.path.join(base_dir, "..", "Dataset", "Benchmark_dataset", "new", "esmc_pos_test.npy")
+        model_path = os.path.join(base_dir, "..", "Model-saved", "Model-Saved-Benchmark")
 
         tester: ModelTester = ModelTester(
             pos_data_path=pos_data_path,
@@ -27,11 +27,11 @@ if __name__ == '__main__':
     # region train general
     # Processed dataset (originated from https://github.com/KOALA-L/ECAmyloid/blob/main/README.md)
     if test_general:
-        neg_data_path = os.path.join(base_dir, "../..", "Dataset", "Generalized_dataset", "new",
+        neg_data_path = os.path.join(base_dir, "..", "Dataset", "Generalized_dataset", "new",
                                      "esmc_neg_test.npy")
-        pos_data_path = os.path.join(base_dir, "../..", "Dataset", "Generalized_dataset", "new",
+        pos_data_path = os.path.join(base_dir, "..", "Dataset", "Generalized_dataset", "new",
                                      "esmc_pos_test.npy")
-        model_path = os.path.join(base_dir, "../..", "Model-saved", "Model-Saved-General")
+        model_path = os.path.join(base_dir, "..", "Model-saved", "Model-Saved-General")
 
         tester: ModelTester = ModelTester(
             pos_data_path=pos_data_path,
