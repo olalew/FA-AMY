@@ -24,6 +24,8 @@ class ModelTrainer:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def train(self, model_path: str):
+        os.makedirs(model_path, exist_ok=True)
+
         neg_train = np.load(self.neg_data_path)
         pos_train = np.load(self.pos_data_path)
 
