@@ -30,16 +30,23 @@ First, you need to download the model weights for ESM C  from the provided Huggi
 
 Save the downloaded weight files in your working directory and make sure you know their exact paths.
 
-Next, you will use the provided `ESM_embedding.py` script to generate embedding features with ESM C. In script, you need to modify the file paths according to your needs.Run the following commands:
-<pre> python ESM_embedding.py </pre>
+Next, you will use the provided `generate_embeddings.py` script to generate embedding features with ESM C. In script, you need to modify the file paths according to your needs.Run the following commands:
+```bash
+cd src
+python generate_embeddings.py
+```
 This will generate the corresponding embedding features files.
 
-Next, you can proceed with model training and validation using the provided `Train.py` script. Before running it, make sure you have prepared the training features and modified the file paths and other parameters according to your needs. Run the following command to start the model training and validation:
-<pre> python Train.py </pre>
+Next, you can proceed with model training and validation using the provided `train.py` script. Before running it, make sure you have prepared the training features and modified the file paths and other parameters according to your needs. Run the following command to start the model training and validation:
+```bash
+python train.py
+```
 After the script finishes running, it will generate the best model file for each fold in the five-fold cross-validation, as well as the final saved model file.
 
-Finally, you can test the model on a independent dataset using the provided `Test.py` script. Make sure you have prepared the test features and modified the file path of saved model according to your needs. Run the following command to test the model:
-<pre> python Test.py </pre>
+Finally, you can test the model on a independent dataset using the provided `test.py` script. Make sure you have prepared the test features and modified the file path of saved model according to your needs. Run the following command to test the model:
+```bash
+python test.py
+```
 
 ##  Dataset
 
