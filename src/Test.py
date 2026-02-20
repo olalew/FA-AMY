@@ -7,11 +7,11 @@ from torch.utils.data import DataLoader
 
 import numpy as np
 
-from tools.metrics_scorer import MetricsScorer
-from tools.random_seed import RandomSeed
+from src.tools.metrics_scorer import MetricsScorer
+from src.tools.random_seed import RandomSeed
 
-from dataset.bioinformatics_dataset import BioinformaticsDataset
-from model.fa_amy_module import FAAmyModule
+from src.dataset.bioinformatics_dataset import BioinformaticsDataset
+from src.model.fa_amy_module import FAAmyModule
 
 RandomSeed.random_seed(777)
 

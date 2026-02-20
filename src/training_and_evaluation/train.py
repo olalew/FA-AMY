@@ -1,7 +1,7 @@
 import os
 
-from tools.random_seed import RandomSeed
-from training_and_evaluation.model_trainer import ModelTrainer
+from src.tools.random_seed import RandomSeed
+from src.training_and_evaluation.model_trainer import ModelTrainer
 
 if __name__ == '__main__':
     base_dir = os.path.dirname(os.path.abspath(__file__))

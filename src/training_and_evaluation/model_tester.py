@@ -4,9 +4,9 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from dataset.bioinformatics_dataset import BioinformaticsDataset
-from model.fa_amy_module import FAAmyModule
-from tools.metrics_scorer import MetricsScorer
+from src.dataset.bioinformatics_dataset import BioinformaticsDataset
+from src.model.fa_amy_module import FAAmyModule
+from src.tools.metrics_scorer import MetricsScorer
 
 
 class ModelTester:

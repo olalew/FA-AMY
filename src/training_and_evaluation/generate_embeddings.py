@@ -3,8 +3,8 @@ import os
 import pandas as pd
 from Bio import SeqIO
 
-from tools.random_seed import RandomSeed
-from training_and_evaluation.embeddings_generator import EmbeddingsGenerator
+from src.tools.random_seed import RandomSeed
+from src.training_and_evaluation.embeddings_generator import EmbeddingsGenerator
 
 
 class GenerateEmbeddings:
