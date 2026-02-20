@@ -11,9 +11,9 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 import copy
 
-from src.tools.random_seed import RandomSeed
-from src.dataset.bioinformatics_dataset import BioinformaticsDataset
-from src.model.fa_amy_module import FAAmyModule
+from tools.random_seed import RandomSeed
+from dataset.bioinformatics_dataset import BioinformaticsDataset
+from model.fa_amy_module import FAAmyModule
 
 RandomSeed.random_seed(777)
 
